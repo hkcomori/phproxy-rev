@@ -1,0 +1,8 @@
+SetEnv PROXY_SOCKET unix:/path/to/app.sock
+SetEnv START_SOCKET_CMD "/path/to/app/.venv/bin/gunicorn -c /path/to/app/gunicorn.py main:app"
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+    RewriteRule ^(.*)$ p/index.php [QSA,PT,L]
+</IfModule>

@@ -1,0 +1,36 @@
+parameters:
+	level: 9	# https://phpstan.org/user-guide/rule-levels
+	fileExtensions:
+		- php
+		- phtml
+	paths:
+		- .
+	excludePaths:
+		analyse:
+			- vendor/*
+		analyseAndScan:
+			- .git/*
+	checkMissingOverrideMethodAttribute: true
+	reportMaybesInPropertyPhpDocTypes: false
+	treatPhpDocTypesAsCertain: false
+	strictRules:
+		allRules: false
+		booleansInConditions: false	# TODO pass
+		closureUsesThis: true
+		disallowedConstructs: false
+		disallowedLooseComparison: false
+		matchingInheritedMethodNames: true
+		noVariableVariables: true
+		numericOperandsInArithmeticOperators: true
+		overwriteVariablesWithLoop: true
+		requireParentConstructorCall: true
+		strictCalls: true
+		switchConditionsMatchingType: true
+		uselessCast: true
+	ignoreErrors:
+		# - '#Only booleans are allowed in (a negated boolean|a ternary operator condition|an elseif condition|an if condition|&&|\|\|), (bool|false|int(<[0-9, max]+>)?|true|null|\|)+ given.*#'
+includes:
+	- vendor/phpstan/phpstan-phpunit/extension.neon
+	- vendor/phpstan/phpstan-phpunit/rules.neon
+	- vendor/phpstan/phpstan-strict-rules/rules.neon
+	# - vendor/phpstan/phpstan/conf/bleedingEdge.neon

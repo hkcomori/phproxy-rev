@@ -1,0 +1,58 @@
+name: Automated tests
+
+on:
+  push:
+    branches:
+    - main
+    - develop
+    paths-ignore:
+    - '.github/ISSUE_TEMPLATE/**'
+    - '**.htaccess'
+    - '**.htaccess_sample'
+    - 'README.md'
+  pull_request:
+    branches:
+    - main
+
+jobs:
+
+  tests:
+    # https://github.com/actions/virtual-environments
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Git checkout source code
+      uses: actions/checkout@v4
+
+    # Composer tests
+
+    - name: Check PHP syntax
+      run: composer run-script php-lint
+
+    - name: Check PHTML syntax
+      run: composer run-script phtml-lint
+
+    - name: Use Composer cache
+      id: composer-cache
+      uses: actions/cache@v4
+      with:
+        path: vendor
+        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-php-
+
+    - name: Run Composer install
+      run: composer install --prefer-dist --no-progress
+      if: steps.composer-cache.outputs.cache-hit != 'true'
+
+    - name: Run PHP unit tests
+      run: composer run-script phpunit
+
+    - name: PHP_CodeSniffer
+      run: composer run-script phpcs
+
+    - name: PHPStan
+      run: composer run-script phpstan
+
+    - name: PHPStan Next Level
+      run: composer run-script phpstan-next

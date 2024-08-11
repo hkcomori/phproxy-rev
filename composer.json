@@ -1,0 +1,56 @@
+{
+    "name": "hkcomori/phproxy-rev",
+    "description": "Reverse proxy written in PHP",
+    "type": "project",
+    "homepage": "https://github.com/hkcomori/phproxy-rev/",
+    "license": "MIT",
+    "support": {
+        "docs": "https://github.com/hkcomori/phproxy-rev/",
+        "issues": "https://github.com/hkcomori/phproxy-rev/issues",
+        "source": "https://github.com/hkcomori/phproxy-rev/"
+    },
+    "keywords": [
+        "proxy"
+    ],
+    "require": {
+        "php": ">=8.1"
+    },
+    "config": {
+        "platform": {
+            "php": "8.1"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\": "app/"
+        }
+    },
+    "require-dev": {
+        "php": ">=8.1",
+        "phpstan/phpstan": "*",
+        "phpstan/phpstan-phpunit": "*",
+        "phpstan/phpstan-strict-rules": "*",
+        "phpunit/phpunit": "*",
+        "squizlabs/php_codesniffer": "*"
+    },
+    "scripts": {
+        "php-lint": "find . -type d -name 'vendor' -prune -o -name '*.php' -print0 | xargs -0 -n1 -P4 php -l 1>/dev/null",
+        "phtml-lint": "find . -type d -name 'vendor' -prune -o -name '*.phtml' -print0 | xargs -0 -n1 -P4 php -l 1>/dev/null",
+        "phpcs": "phpcs . -s",
+        "phpcbf": "phpcbf . -p -s",
+        "phpstan": "phpstan analyse --memory-limit 512M .",
+        "phpstan-next": "phpstan analyse --memory-limit 512M .",
+        "phpunit": "phpunit --bootstrap ./tests/bootstrap.php --display-warnings --display-errors ./tests",
+        "test": [
+            "@php-lint",
+            "@phtml-lint",
+            "@phpunit",
+            "@phpcs",
+            "@phpstan",
+            "@phpstan-next"
+        ],
+        "fix": [
+            "@phpcbf"
+        ]
+    }
+}
