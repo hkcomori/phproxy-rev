@@ -25,6 +25,8 @@ final class Http1SocketResponseTest extends PHPUnit\Framework\TestCase {
         }
 
         static::assertSame("hello world!", $parsed_response->body);
+
+        static::assertSame($response, $parsed_response->to_string());
     }
 
     public function test_from_string_without_status_line(): void {

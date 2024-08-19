@@ -37,7 +37,6 @@ final class Curl {
                     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
                     break;
             }
-            echo "---\r\n{$method}\r\n";
 
             curl_setopt($ch, CURLOPT_HTTPHEADER, $request->header_lines());
 
