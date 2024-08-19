@@ -23,33 +23,33 @@ final class ReversePHProxy {
         }
 
         $body = @file_get_contents($input) ?: "";
-        $request = Models\Http1SocketRequest::from_cgi($env, $body)->to_string();
+        $request = Models\Http1SocketRequest::from_cgi($env, $body);
         unset($body);
 
         if ($display_http_enabled === true) {
-            echo $request;
+            echo $request->to_string();
         }
 
-        $sock = (new Models\SocketFactory)->create($env["REVERSE_PHPROXY_BACKEND"]);
-        $sock->connect(
-            $env["REVERSE_PHPROXY_START_BACKEND"] ?? "",
-            (int)($env["REVERSE_PHPROXY_START_BACKEND_TIMEOUT"] ?? "180"),
-        );
+        $sock = Models\Curl::create($env["REVERSE_PHPROXY_BACKEND"]);
+        //$sock->connect(
+        //    $env["REVERSE_PHPROXY_START_BACKEND"] ?? "",
+        //    (int)($env["REVERSE_PHPROXY_START_BACKEND_TIMEOUT"] ?? "180"),
+        //);
         $response = $sock->send($request);
 
-        if ($display_http_enabled === true) {
-            echo "---\r\n";
-            echo $response;
-            return;
-        }
+        // if ($display_http_enabled === true) {
+        //     echo "---\r\n";
+        //     echo $response;
+        //     return;
+        // }
 
-        $parsed_response = Models\Http1SocketResponse::from_string($response);
-        unset($sock, $request, $response);
+        // $parsed_response = Models\Http1SocketResponse::from_string($response);
+        // unset($sock, $request, $response);
 
-        http_response_code($parsed_response->status_code);
-        foreach ($parsed_response->header_lines as $value) {
+        http_response_code($response->status_code);
+        foreach ($response->header_lines as $value) {
             header($value);
         }
-        echo $parsed_response->body;
+        echo $response->body;
     }
 }

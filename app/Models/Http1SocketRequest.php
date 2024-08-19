@@ -8,20 +8,44 @@ final class Http1SocketRequest {
      * @param array<string, string> $headers
      * @param string $body
      */
-    function __construct(private string $request_line, private array $headers, private string $body) {
+    function __construct(
+        private string $method,
+        private string $path,
+        private string $protocol,
+        private array $headers,
+        private string $body,
+    ) {
     }
 
     public function to_string(): string {
-        $lines = [$this->request_line];
+        $lines = [
+            $this->request_line(),
+            ...$this->header_lines(),
+            "",
+            $this->body,
+        ];
+
+        return implode("\r\n", $lines);
+    }
+
+    /**
+     * @return string[]     Header lines
+     */
+    public function request_line(): string {
+        return "{$this->method} {$this->path} {$this->protocol}";
+    }
+
+    /**
+     * @return string[]     Header lines
+     */
+    public function header_lines(): array {
+        $lines = [];
 
         foreach ($this->headers as $key => $value) {
             $lines[] = rtrim("{$key}: {$value}");
         }
 
-        $lines[] = "";
-        $lines[] = $this->body;
-
-        return implode("\r\n", $lines);
+        return $lines;
     }
 
     /**
@@ -34,7 +58,7 @@ final class Http1SocketRequest {
         $query_string = @$env["QUERY_STRING"] ? ("?" . $env["QUERY_STRING"]) : "";
         $protocol = $env["SERVER_PROTOCOL"];
 
-        $request_line = "{$method} {$path_info}{$query_string} {$protocol}";
+        $path = "{$path_info}{$query_string}";
         $headers = [
             "Host" => $env["HTTP_HOST"] ?? "",
             "Content-Length" => $env["CONTENT_LENGTH"] ?? (string)strlen($body)
@@ -69,7 +93,7 @@ final class Http1SocketRequest {
             $headers[$header_key] = $value;
         }
 
-        return new static($request_line, $headers, $body);
+        return new static($method, $path, $protocol, $headers, $body);
     }
 
     /**
