@@ -34,6 +34,7 @@ final class Curl {
                     break;
                 case 'DELETE':
                     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+                    break;
                 case 'GET':
                 default:
                     break;
