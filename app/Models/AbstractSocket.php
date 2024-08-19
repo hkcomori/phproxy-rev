@@ -71,7 +71,7 @@ abstract class AbstractSocket {
             }
 
             $response .= $chunk;
-        } while (strlen($chunk) >= $size);
+        } while (strlen($chunk) === 0);
 
         return $response;
     }
