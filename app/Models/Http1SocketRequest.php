@@ -4,16 +4,18 @@ namespace app\Models;
 
 final class Http1SocketRequest {
     /**
-     * @param string $request_line
+     * @param string $method
+     * @param string $path
+     * @param string $protocol
      * @param array<string, string> $headers
      * @param string $body
      */
     function __construct(
-        private string $method,
-        private string $path,
-        private string $protocol,
-        private array $headers,
-        private string $body,
+        public readonly string $method,
+        public readonly string $path,
+        public readonly string $protocol,
+        public readonly array $headers,
+        public readonly string $body,
     ) {
     }
 
@@ -29,7 +31,7 @@ final class Http1SocketRequest {
     }
 
     /**
-     * @return string[]     Header lines
+     * @return string       Request line
      */
     public function request_line(): string {
         return "{$this->method} {$this->path} {$this->protocol}";

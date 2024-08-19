@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace app;
+use SebastianBergmann\Type\RuntimeException;
 
 final class ReversePHProxy {
     /**
@@ -36,6 +37,9 @@ final class ReversePHProxy {
         //    (int)($env["REVERSE_PHPROXY_START_BACKEND_TIMEOUT"] ?? "180"),
         //);
         $response = $sock->send($request);
+        if ($response === false) {
+            throw new RuntimeException('Curl failed');
+        }
 
         // if ($display_http_enabled === true) {
         //     echo "---\r\n";

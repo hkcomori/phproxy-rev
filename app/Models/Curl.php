@@ -2,9 +2,9 @@
 declare(strict_types=1);
 namespace app\Models;
 
-class Curl {
+final class Curl {
     /**
-     * @param array<int, mixed> opt
+     * @param array<int, mixed> $opts   Curl options
      */
     function __construct(protected array $opts) {
     }
@@ -54,14 +54,13 @@ class Curl {
             curl_close($ch);
         }
 
-        if ($response === false) {
+        if (is_string($response) === false) {
             return false;
         }
         return Http1SocketResponse::from_string($response);
     }
 
-    public static function create(string $uri): Self
-    {
+    public static function create(string $uri): Self {
         $opts = [];
         $parsed_url = parse_url($uri);
         if (($parsed_url === false) || (array_key_exists("scheme", $parsed_url) === false)) {
