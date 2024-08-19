@@ -6,12 +6,27 @@ final class Http1SocketResponse {
     /** @var string[] */
     public array $header_lines;
 
-    function __construct(public int $status_code, string $header, public string $body) {
+    function __construct(
+        public readonly string $protocol,
+        public readonly int $status_code,
+        public readonly string $response_phrase,
+        string $header,
+        public readonly string $body,
+    ) {
         if (($status_code < 100) || (999 < $status_code)) {
             throw new \UnexpectedValueException("status_code: ".$status_code);
 
         }
         $this->header_lines = explode("\r\n", $header);
+    }
+
+    public function to_string(): string {
+        return implode("\r\n", [
+            "{$this->protocol} {$this->status_code} {$this->response_phrase}",
+            ...$this->header_lines,
+            "",
+            $this->body,
+        ]);
     }
 
     static public function from_string(string $response): self {
@@ -23,6 +38,12 @@ final class Http1SocketResponse {
             throw new \UnexpectedValueException("Protocol: ".$protocol);
         }
 
-        return new static((int)$status_code, $header, $body ?: "");
+        return new static(
+            $protocol,
+            (int)$status_code,
+            $response_phrase,
+            $header,
+            $body ?: "",
+        );
     }
 }

@@ -41,11 +41,11 @@ final class ReversePHProxy {
             throw new RuntimeException('Curl failed');
         }
 
-        // if ($display_http_enabled === true) {
-        //     echo "---\r\n";
-        //     echo $response;
-        //     return;
-        // }
+        if ($display_http_enabled === true) {
+            echo "---\r\n";
+            echo $response->to_string();
+            return;
+        }
 
         // $parsed_response = Models\Http1SocketResponse::from_string($response);
         // unset($sock, $request, $response);
