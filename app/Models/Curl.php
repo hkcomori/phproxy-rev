@@ -39,7 +39,7 @@ final class Curl {
                     break;
             }
 
-            curl_setopt($ch, CURLOPT_HTTPHEADER, [$request->header_lines()]);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $request->header_lines());
             curl_setopt($ch, CURLOPT_POSTFIELDS, $request->body);
 
             foreach ($this->opts as $option => $value) {
