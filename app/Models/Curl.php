@@ -26,17 +26,17 @@ final class Curl {
         try {
             $method = strtoupper($request->method);
             switch ($method) {
+                case 'GET':
+                    curl_setopt($ch, CURLOPT_HTTPGET, true);
+                    break;
                 case 'POST':
                     curl_setopt($ch, CURLOPT_POST, true);
                     break;
                 case 'PUT':
                     curl_setopt($ch, CURLOPT_PUT, true);
                     break;
-                case 'DELETE':
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-                    break;
-                case 'GET':
                 default:
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
                     break;
             }
 
