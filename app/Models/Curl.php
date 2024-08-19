@@ -31,9 +31,7 @@ final class Curl {
                     break;
                 case 'POST':
                     curl_setopt($ch, CURLOPT_POST, true);
-                    break;
-                case 'PUT':
-                    curl_setopt($ch, CURLOPT_PUT, true);
+                    curl_setopt($ch, CURLOPT_POSTFIELDS, $request->body);
                     break;
                 default:
                     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
@@ -42,7 +40,6 @@ final class Curl {
             echo "---\r\n{$method}\r\n";
 
             curl_setopt($ch, CURLOPT_HTTPHEADER, $request->header_lines());
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $request->body);
 
             foreach ($this->opts as $option => $value) {
                 curl_setopt($ch, $option, $value);
