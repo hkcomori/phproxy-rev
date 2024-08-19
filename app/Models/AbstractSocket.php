@@ -67,18 +67,14 @@ abstract class AbstractSocket {
         $w = null;
         $e = null;
         $response = "";
-        do {
-            $num_changed_sockets = socket_select($r, $w, $e, null);
-            if ($num_changed_sockets === false) {
-                break;
-            }
+        while (socket_select($r, $w, $e, null) !== false) {
             $chunk = socket_read($this->sock, $size);
-            if ($chunk === false) {
+            if ($chunk === false || strlen($chunk) === 0) {
                 break;
             }
 
             $response .= $chunk;
-        } while (strlen($chunk) === 0);
+        }
 
         return $response;
     }
