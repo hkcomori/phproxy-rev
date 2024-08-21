@@ -32,13 +32,13 @@ final class ReversePHProxy {
         }
 
         $client = Models\Http1Client::create($env["REVERSE_PHPROXY_BACKEND"]);
-        //$client->connect(
-        //    $env["REVERSE_PHPROXY_START_BACKEND"] ?? "",
-        //    (int)($env["REVERSE_PHPROXY_START_BACKEND_TIMEOUT"] ?? "180"),
-        //);
-        $response = $client->send($request);
-        if ($response === false) {
-            throw new RuntimeException('Curl failed');
+        try {
+            $response = $client->send($request);
+        } catch (Models\CurlExecException $th) {
+            static::start_backend($env['REVERSE_PHPROXY_START_BACKEND'] ?? '');
+            $timeout_sec = (int) ($env['REVERSE_PHPROXY_START_BACKEND_TIMEOUT'] ?? '180');
+            $client->wait_connectable($timeout_sec);
+            $response = $client->send($request);
         }
 
         if ($display_http_enabled === true) {
@@ -52,5 +52,16 @@ final class ReversePHProxy {
             header($value);
         }
         echo $response->body;
+    }
+
+    private static function start_backend(string $command): void {
+        if (empty($command)) {
+            throw new \RuntimeException("Cannot connect backend");
+        }
+
+        $proc = @proc_open($command, [], $pipes);
+        if ($proc === false) {
+            throw new \RuntimeException("Command not found: $command");
+        }
     }
 }

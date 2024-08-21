@@ -15,7 +15,7 @@ final class Http1Client {
      * @param Http1SocketRequest $request   HTTP request
      * @return Http1SocketResponse          HTTP response
      */
-    public function send(Http1SocketRequest $request): Http1SocketResponse|false {
+    public function send(Http1SocketRequest $request): Http1SocketResponse {
         $host = $request->headers['Host'] ?? 'localhost';
         $ch = curl_init($host . $request->path);
         if ($ch === false) {
@@ -46,14 +46,36 @@ final class Http1Client {
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
             $response = curl_exec($ch);
+
+            assert($response !== true);
+            if ($response === false) {
+                throw new CurlExecException($ch);
+            }
         } finally {
             curl_close($ch);
         }
 
-        if (is_string($response) === false) {
-            return false;
-        }
         return Http1SocketResponse::from_string($response);
+    }
+
+    public function wait_connectable(int $timeout_sec): void {
+        $time_limit = time() + $timeout_sec;
+        $ch = curl_init();
+        if ($ch === false) {
+            throw new \RuntimeException('curl_init failed');
+        }
+
+        try {
+            curl_setopt($ch, CURLOPT_CONNECT_ONLY, true);
+            while (curl_exec($ch) === false) {
+                sleep(1);
+                if (time() > $time_limit) {
+                    throw new \RuntimeException("Cannot connect backend");
+                }
+            }
+        } finally {
+            curl_close($ch);
+        }
     }
 
     public static function create(string $uri): Self {
