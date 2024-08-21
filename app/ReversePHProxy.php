@@ -31,12 +31,12 @@ final class ReversePHProxy {
             echo $request->to_string();
         }
 
-        $curl = Models\Curl::create($env["REVERSE_PHPROXY_BACKEND"]);
-        //$curl->connect(
+        $client = Models\Http1Client::create($env["REVERSE_PHPROXY_BACKEND"]);
+        //$client->connect(
         //    $env["REVERSE_PHPROXY_START_BACKEND"] ?? "",
         //    (int)($env["REVERSE_PHPROXY_START_BACKEND_TIMEOUT"] ?? "180"),
         //);
-        $response = $curl->send($request);
+        $response = $client->send($request);
         if ($response === false) {
             throw new RuntimeException('Curl failed');
         }

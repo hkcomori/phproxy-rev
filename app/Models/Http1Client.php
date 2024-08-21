@@ -2,9 +2,9 @@
 declare(strict_types=1);
 namespace app\Models;
 
-final class Curl {
+final class Http1Client {
     /**
-     * @param array<int, mixed> $opts   Curl options
+     * @param array<int, mixed> $opts   Associative array of Curl options
      */
     function __construct(protected array $opts) {
     }
@@ -22,8 +22,11 @@ final class Curl {
             throw new \RuntimeException('curl_init failed');
         }
 
-        $response = false;
         try {
+            foreach ($this->opts as $option => $value) {
+                curl_setopt($ch, $option, $value);
+            }
+
             $method = strtoupper($request->method);
             switch ($method) {
                 case 'GET':
@@ -39,11 +42,6 @@ final class Curl {
             }
 
             curl_setopt($ch, CURLOPT_HTTPHEADER, $request->header_lines());
-
-            foreach ($this->opts as $option => $value) {
-                curl_setopt($ch, $option, $value);
-            }
-
             curl_setopt($ch, CURLOPT_HEADER, true);
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
