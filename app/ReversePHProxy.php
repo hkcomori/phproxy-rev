@@ -1,51 +1,33 @@
 <?php
 declare(strict_types=1);
 namespace app;
-use SebastianBergmann\Type\RuntimeException;
 
 final class ReversePHProxy {
     /**
      * @param array<string, string> $env    Environment variables
      * @param string $input                 Path to the input file
      */
-    static public function handle_request(array $env, string $input): void {
-        $display_http_enabled = false;
-        if (array_key_exists("REVERSE_PHPROXY_DEBUG", $_SERVER) === true) {
-            switch (strtolower($_SERVER['REVERSE_PHPROXY_DEBUG'])) {
-                case 'display-http':
-                    $display_http_enabled = true;
-                    break;
-                case 'display-env':
-                default:
-                    header("Content-Type: application/json; charset=utf-8");
-                    echo json_encode($_SERVER);
-                    return;
-            }
-        }
+    public static function handle_request(array $env, string $input): void {
+        $config = Models\Config::from_env($env);
+        $logger = new Models\Logger('php://stdout', $config->log_level);
 
-        $body = @file_get_contents($input) ?: "";
-        $request = Models\Http1SocketRequest::from_cgi($env, $body);
-        unset($body);
+        $request = Models\Http1SocketRequest::from_cgi(
+            $env,
+            @file_get_contents($input) ?: '',
+        );
 
-        if ($display_http_enabled === true) {
-            echo $request->to_string();
-        }
+        $logger->debug($request->to_string());
 
-        $client = Models\Http1Client::create($env["REVERSE_PHPROXY_BACKEND"]);
+        $client = Models\Http1Client::create($config->backend_uri);
         try {
             $response = $client->send($request);
         } catch (Models\CurlExecException $th) {
-            static::start_backend($env['REVERSE_PHPROXY_START_BACKEND'] ?? '');
-            $timeout_sec = (int) ($env['REVERSE_PHPROXY_START_BACKEND_TIMEOUT'] ?? '180');
-            $client->wait_connectable($timeout_sec);
+            static::start_backend($config->start_backend_cmd);
+            $client->wait_connectable($config->start_backend_timeout);
             $response = $client->send($request);
         }
 
-        if ($display_http_enabled === true) {
-            echo "---\r\n";
-            echo $response->to_string();
-            return;
-        }
+        $logger->debug($response->to_string());
 
         http_response_code($response->status_code);
         foreach ($response->header_lines as $value) {
