@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace app\Models;
 
-final class Http1SocketRequest {
+final class HttpRequest {
     /**
      * @param string $method
      * @param string $path

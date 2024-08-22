@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-final class Http1SocketResponseTest extends PHPUnit\Framework\TestCase {
+final class HttpResponseTest extends PHPUnit\Framework\TestCase {
     public function test_from_string(): void {
         $response = implode("\r\n", [
             "HTTP/1.1 200 OK",
@@ -11,7 +11,7 @@ final class Http1SocketResponseTest extends PHPUnit\Framework\TestCase {
             "",
             "hello world!",
         ]);
-        $parsed_response = app\Models\Http1SocketResponse::from_string($response);
+        $parsed_response = app\Models\HttpResponse::from_string($response);
 
         static::assertSame(200, $parsed_response->status_code);
 
@@ -39,7 +39,7 @@ final class Http1SocketResponseTest extends PHPUnit\Framework\TestCase {
             "",
             "hello world!",
         ]);
-        $parsed_response = app\Models\Http1SocketResponse::from_string($response);
+        $parsed_response = app\Models\HttpResponse::from_string($response);
     }
 
     public function test_from_string_with_illigal_prptocol(): void {
@@ -53,7 +53,7 @@ final class Http1SocketResponseTest extends PHPUnit\Framework\TestCase {
             "",
             "hello world!",
         ]);
-        $parsed_response = app\Models\Http1SocketResponse::from_string($response);
+        $parsed_response = app\Models\HttpResponse::from_string($response);
     }
 
     public function test_from_string_with_illigal_status_code(): void {
@@ -67,7 +67,7 @@ final class Http1SocketResponseTest extends PHPUnit\Framework\TestCase {
             "",
             "hello world!",
         ]);
-        $parsed_response = app\Models\Http1SocketResponse::from_string($response);
+        $parsed_response = app\Models\HttpResponse::from_string($response);
 
         $response = implode("\r\n", [
             "HTTP/1.1 1000 OK",
@@ -77,7 +77,7 @@ final class Http1SocketResponseTest extends PHPUnit\Framework\TestCase {
             "",
             "hello world!",
         ]);
-        $parsed_response = app\Models\Http1SocketResponse::from_string($response);
+        $parsed_response = app\Models\HttpResponse::from_string($response);
     }
 
     public function test_from_string_without_body(): void {
@@ -89,7 +89,7 @@ final class Http1SocketResponseTest extends PHPUnit\Framework\TestCase {
             "",
             "",
         ]);
-        $parsed_response = app\Models\Http1SocketResponse::from_string($response);
+        $parsed_response = app\Models\HttpResponse::from_string($response);
 
         static::assertSame(200, $parsed_response->status_code);
         static::assertSame([

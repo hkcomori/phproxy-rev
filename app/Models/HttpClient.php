@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace app\Models;
 
-final class Http1Client {
+final class HttpClient {
     /**
      * @param array<int, mixed> $opts   Associative array of Curl options
      */
@@ -12,10 +12,10 @@ final class Http1Client {
     /**
      * Connect to socket and execute command if socket is not listening
      *
-     * @param Http1SocketRequest $request   HTTP request
-     * @return Http1SocketResponse          HTTP response
+     * @param HttpRequest $request   HTTP request
+     * @return HttpResponse          HTTP response
      */
-    public function send(Http1SocketRequest $request): Http1SocketResponse {
+    public function send(HttpRequest $request): HttpResponse {
         $host = $request->headers['Host'] ?? 'localhost';
         $ch = curl_init($host . $request->path);
         if ($ch === false) {
@@ -55,7 +55,7 @@ final class Http1Client {
             curl_close($ch);
         }
 
-        return Http1SocketResponse::from_string($response);
+        return HttpResponse::from_string($response);
     }
 
     public function wait_connectable(int $timeout_sec): void {

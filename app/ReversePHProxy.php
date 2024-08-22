@@ -11,14 +11,14 @@ final class ReversePHProxy {
         $config = Models\Config::from_env($env);
         $logger = new Models\Logger('php://stdout', $config->log_level);
 
-        $request = Models\Http1SocketRequest::from_cgi(
+        $request = Models\HttpRequest::from_cgi(
             $env,
             @file_get_contents($input) ?: '',
         );
 
         $logger->debug($request->to_string());
 
-        $client = Models\Http1Client::create($config->backend_uri);
+        $client = Models\HttpClient::create($config->backend_uri);
         try {
             $response = $client->send($request);
         } catch (Models\CurlExecException $th) {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-final class Http1SocketRequestTest extends PHPUnit\Framework\TestCase {
+final class HttpRequestTest extends PHPUnit\Framework\TestCase {
     public function test_post_from_cgi(): void {
         $env = array(
             'REQUEST_METHOD' => 'POST',
@@ -21,7 +21,7 @@ final class Http1SocketRequestTest extends PHPUnit\Framework\TestCase {
         );
         $body = 'hello world!';
 
-        $request = app\Models\Http1SocketRequest::from_cgi($env, $body);
+        $request = app\Models\HttpRequest::from_cgi($env, $body);
 
         static::assertSame('POST', $request->method);
         static::assertSame('/path/to/hello/world?one=1&two=2', $request->path);
@@ -65,7 +65,7 @@ final class Http1SocketRequestTest extends PHPUnit\Framework\TestCase {
         );
         $body = '';
 
-        $request = app\Models\Http1SocketRequest::from_cgi($env, $body)->to_string();
+        $request = app\Models\HttpRequest::from_cgi($env, $body)->to_string();
 
         static::assertStringStartsWith(implode("\r\n", [
             'GET /path/to/hello/world?a=1&foo=bar HTTP/1',
@@ -114,7 +114,7 @@ final class Http1SocketRequestTest extends PHPUnit\Framework\TestCase {
         );
         $body = 'hello world!';
 
-        $request = app\Models\Http1SocketRequest::from_cgi($env, $body)->to_string();
+        $request = app\Models\HttpRequest::from_cgi($env, $body)->to_string();
 
         static::assertStringStartsWith(implode("\r\n", [
             'POST /path/to/hello/world HTTP/1.1',
