@@ -21,7 +21,7 @@ final class ReversePHProxy {
         $client = Models\HttpClient::create($config->backend_uri);
         try {
             $response = $client->send($request);
-        } catch (Models\CurlExecException $th) {
+        } catch (Models\NotConnectableException $th) {
             static::start_backend($config->start_backend_cmd);
             $client->wait_connectable($config->start_backend_timeout);
             $response = $client->send($request);

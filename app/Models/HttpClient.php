@@ -49,7 +49,7 @@ final class HttpClient {
 
             assert($response !== true);
             if ($response === false) {
-                throw new CurlExecException($ch);
+                throw new NotConnectableException(curl_error($ch), curl_errno($ch));
             }
         } finally {
             curl_close($ch);
