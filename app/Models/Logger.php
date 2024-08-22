@@ -3,17 +3,12 @@ declare(strict_types=1);
 namespace app\Models;
 
 final class Logger {
-    /**
-     * Target resource
-     * @var resource
-     */
-    private $resource;
     private bool $debug_enable = false;
     private bool $info_enable = false;
     private bool $warning_enable = false;
     private bool $error_enable = false;
 
-    public function __construct(string $uri, string $log_level) {
+    public function __construct(private string $uri, string $log_level) {
         switch (strtoupper($log_level)) {
             case 'DEBUG':
                 $this->debug_enable = true;
@@ -27,46 +22,45 @@ final class Logger {
             default:
                 throw new \UnexpectedValueException('log_level: ' . $log_level);
         }
-
-        $resource = fopen($uri, 'a');
-        if (!is_resource($resource)) {
-            throw new \RuntimeException('Cannot open ' . $uri);
-        }
-        $this->resource = $resource;
-    }
-
-    public function __destruct() {
-        fclose($this->resource);
     }
 
     public function debug(string $message): void {
-        if ($this->debug_enable && is_resource($this->resource)) {
+        if ($this->debug_enable) {
             $this->output('[DEBUG] ', $message);
         }
     }
 
     public function info(string $message): void {
-        if ($this->info_enable && is_resource($this->resource)) {
+        if ($this->info_enable) {
             $this->output('[INFO] ', $message);
         }
     }
 
     public function warning(string $message): void {
-        if ($this->warning_enable && is_resource($this->resource)) {
+        if ($this->warning_enable) {
             $this->output('[WARNING] ', $message);
         }
     }
 
     public function error(string $message): void {
-        if ($this->error_enable && is_resource($this->resource)) {
+        if ($this->error_enable) {
             $this->output('[ERROR] ', $message);
         }
     }
 
     private function output(string $prefix, string $message): void {
-        $lines = explode("\n", $message);
-        foreach ($lines as $line) {
-            fwrite($this->resource, $prefix . $line . "\n");
+        $resource = fopen($this->uri, 'a');
+        if (!is_resource($resource)) {
+            throw new \RuntimeException('Cannot open ' . $this->uri);
+        }
+
+        try {
+            $lines = explode("\n", $message);
+            foreach ($lines as $line) {
+                fwrite($resource, $prefix . $line . "\n");
+            }
+        } finally {
+            fclose($resource);
         }
     }
 }
