@@ -29,7 +29,7 @@ final class HttpResponse {
         ]);
     }
 
-    static public function from_string(string $response): self {
+    public static function from_string(string $response): self {
         [$status_and_header, $body] = explode("\r\n\r\n", $response, 2);
         [$status_line, $header] = explode("\r\n", $status_and_header, 2);
         [$protocol, $status_code, $response_phrase] = explode(" ", $status_line, 3);

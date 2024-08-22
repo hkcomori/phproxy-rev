@@ -17,6 +17,24 @@ final class HttpRequest {
         public readonly array $headers,
         public readonly string $body,
     ) {
+        switch ($method) {
+            case 'GET':
+            case 'POST':
+            case 'PUT':
+            case 'DELETE':
+            case 'PATCH':
+            case 'HEAD':
+            case 'OPTIONS':
+            case 'CONNECT':
+            case 'TRACE':
+                break;
+            default:
+                throw new \UnexpectedValueException('HttpRequest method: ' . $method);
+        }
+
+        if (strpos($protocol, 'HTTP') !== 0) {
+            throw new \UnexpectedValueException('HttpRequest protocol: ' . $protocol);
+        }
     }
 
     public function to_string(): string {
@@ -54,8 +72,8 @@ final class HttpRequest {
      * @param array<string, string> $env    Server and runtime environment information
      * @param string $body                  HTTP request body
      */
-    static public function from_cgi(array $env, string $body): self {
-        $method = $env["REQUEST_METHOD"];
+    public static function from_cgi(array $env, string $body): self {
+        $method = strtoupper($env["REQUEST_METHOD"]);
         $path_info = $env["PATH_INFO"] ?? $env["SCRIPT_URL"];
         $query_string = @$env["QUERY_STRING"] ? ("?" . $env["QUERY_STRING"]) : "";
         $protocol = $env["SERVER_PROTOCOL"];
@@ -66,8 +84,6 @@ final class HttpRequest {
             "Content-Length" => $env["CONTENT_LENGTH"] ?? (string)strlen($body)
         ];
 
-        $prefix = "HTTP_";
-        $prefix_length = strlen($prefix);
         foreach ($env as $key => $value) {
             switch ($key) {
                 case 'HTTP_HOST':
@@ -90,7 +106,7 @@ final class HttpRequest {
                     if (strpos($key, 'HTTP_') !== 0) continue 2;
             }
 
-            $prefix_removed = substr($key, $prefix_length);
+            $prefix_removed = substr($key, strlen('HTTP_'));
             $header_key = static::convert_train_case_from($prefix_removed);
             $headers[$header_key] = $value;
         }
@@ -104,7 +120,7 @@ final class HttpRequest {
      * @param string $screaming_snake_case  SCREAMING_SNAKE_CASE
      * @return string Train-Case
      */
-    static protected function convert_train_case_from(string $screaming_snake_case): string {
+    protected static function convert_train_case_from(string $screaming_snake_case): string {
         $lowered_words = explode("_", strtolower($screaming_snake_case));
         $first_uppered_words = array_map("ucfirst", $lowered_words);
 

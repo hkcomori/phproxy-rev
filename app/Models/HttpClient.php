@@ -27,8 +27,7 @@ final class HttpClient {
                 curl_setopt($ch, $option, $value);
             }
 
-            $method = strtoupper($request->method);
-            switch ($method) {
+            switch ($request->method) {
                 case 'GET':
                     curl_setopt($ch, CURLOPT_HTTPGET, true);
                     break;
@@ -37,7 +36,7 @@ final class HttpClient {
                     curl_setopt($ch, CURLOPT_POSTFIELDS, $request->body);
                     break;
                 default:
-                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+                    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $request->method);
                     break;
             }
 
