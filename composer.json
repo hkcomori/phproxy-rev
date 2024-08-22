@@ -1,19 +1,20 @@
 {
-    "name": "hkcomori/phproxy-rev",
-    "description": "Reverse proxy written in PHP",
+    "name": "hkcomori/reverse-phproxy",
+    "description": "PHP based a reverse proxy and on demand backend service launcher",
     "type": "project",
-    "homepage": "https://github.com/hkcomori/phproxy-rev/",
+    "homepage": "https://github.com/hkcomori/reverse-phproxy/",
     "license": "MIT",
     "support": {
-        "docs": "https://github.com/hkcomori/phproxy-rev/",
-        "issues": "https://github.com/hkcomori/phproxy-rev/issues",
-        "source": "https://github.com/hkcomori/phproxy-rev/"
+        "docs": "https://github.com/hkcomori/reverse-phproxy/",
+        "issues": "https://github.com/hkcomori/reverse-phproxy/issues",
+        "source": "https://github.com/hkcomori/reverse-phproxy/"
     },
     "keywords": [
         "proxy"
     ],
     "require": {
-        "php": ">=8.1"
+        "php": ">=8.1",
+        "ext-curl": "*"
     },
     "config": {
         "platform": {
