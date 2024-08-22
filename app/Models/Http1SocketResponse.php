@@ -6,7 +6,7 @@ final class Http1SocketResponse {
     /** @var string[] */
     public array $header_lines;
 
-    function __construct(
+    private function __construct(
         public readonly string $protocol,
         public readonly int $status_code,
         public readonly string $response_phrase,

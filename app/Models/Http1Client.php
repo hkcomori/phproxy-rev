@@ -6,7 +6,7 @@ final class Http1Client {
     /**
      * @param array<int, mixed> $opts   Associative array of Curl options
      */
-    function __construct(protected array $opts) {
+    private function __construct(protected array $opts) {
     }
 
     /**

@@ -10,7 +10,7 @@ final class Http1SocketRequest {
      * @param array<string, string> $headers
      * @param string $body
      */
-    function __construct(
+    private function __construct(
         public readonly string $method,
         public readonly string $path,
         public readonly string $protocol,

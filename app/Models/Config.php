@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace app\Models;
 
 final class Config {
-    public function __construct(
+    private function __construct(
         public readonly string $backend_uri,
         public readonly string $start_backend_cmd,
         public readonly int $start_backend_timeout,
