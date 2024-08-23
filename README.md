@@ -49,11 +49,11 @@ So a single installation provides features for multiple public directories.
 
 Define it using `SetEnv` at `.htaccess` (See also [the example](.htaccess_sample).).
 
-### `REVERSE_PHPROXY_BACKEND`
+### `REVERSE_PHPROXY_BACKEND_URI`
 
 Backend socket URL  (eg. `unix:/path/to/app.sock`).
 
-### `REVERSE_PHPROXY_START_BACKEND` (OPTIONAL)
+### `REVERSE_PHPROXY_BACKEND_CMD` (OPTIONAL)
 
 Default: `""`
 
@@ -61,7 +61,7 @@ Command line string to start backend socket listening (eg. `/path/to/app/.venv/b
 It must start the server process on background, not on foreground.
 If set to blank (or no set), don't attempt to start backend socket listening.
 
-### `REVERSE_PHPROXY_START_BACKEND_TIMEOUT` (OPTIONAL)
+### `REVERSE_PHPROXY_BACKEND_TIMEOUT` (OPTIONAL)
 
 Default: `180`
 

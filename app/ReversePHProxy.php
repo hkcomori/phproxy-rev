@@ -22,8 +22,8 @@ final class ReversePHProxy {
         try {
             $response = $client->send($request);
         } catch (Models\NotConnectableException $th) {
-            static::start_backend($config->start_backend_cmd);
-            $client->wait_connectable($config->start_backend_timeout);
+            static::start_backend($config->backend_cmd);
+            $client->wait_connectable($config->backend_timeout);
             $response = $client->send($request);
         }
 
