@@ -8,6 +8,7 @@ final class Config {
         public readonly string $start_backend_cmd,
         public readonly int $start_backend_timeout,
         public readonly string $log_level,
+        public readonly string $log_file,
     ) {
     }
 
@@ -22,6 +23,7 @@ final class Config {
             $env['REVERSE_PHPROXY_START_BACKEND'] ?? '',
             (int)($env['REVERSE_PHPROXY_START_BACKEND_TIMEOUT'] ?? '180'),
             $env['REVERSE_PHPROXY_LOG_LEVEL'] ?? 'WARNING',
+            $env['REVERSE_PHPROXY_LOG_FILE'] ?? 'php://stdout',
         );
     }
 }

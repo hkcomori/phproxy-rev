@@ -9,7 +9,7 @@ final class ReversePHProxy {
      */
     public static function handle_request(array $env, string $input): void {
         $config = Models\Config::from_env($env);
-        $logger = new Models\Logger('php://stdout', $config->log_level);
+        $logger = new Models\Logger($config->log_file, $config->log_level);
 
         $request = Models\HttpRequest::from_cgi(
             $env,
