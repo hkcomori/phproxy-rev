@@ -11,29 +11,36 @@ final class ReversePHProxy {
         $config = Models\Config::from_env($env);
         $logger = new Models\Logger($config->log_file, $config->log_level);
 
-        $request = Models\HttpRequest::from_cgi(
-            $env,
-            @file_get_contents($input) ?: '',
-        );
-
-        $logger->debug($request->to_string());
-
-        $client = Models\HttpClient::create($config->backend_uri);
         try {
-            $response = $client->send($request);
-        } catch (Models\NotConnectableException $th) {
-            static::start_backend($config->backend_cmd);
-            $client->wait_connectable($config->backend_timeout);
-            $response = $client->send($request);
-        }
+            $request = Models\HttpRequest::from_cgi(
+                $env,
+                @file_get_contents($input) ?: '',
+            );
 
-        $logger->debug($response->to_string());
+            $logger->debug($request->to_string());
 
-        http_response_code($response->status_code);
-        foreach ($response->header_lines as $value) {
-            header($value);
+            $client = Models\HttpClient::create($config->backend_uri);
+            try {
+                $response = $client->send($request);
+            } catch (Models\NotConnectableException $th) {
+                static::start_backend($config->backend_cmd);
+                $client->wait_connectable($config->backend_timeout);
+                $response = $client->send($request);
+            }
+
+            $logger->debug($response->to_string());
+
+            http_response_code($response->status_code);
+            foreach ($response->header_lines as $value) {
+                header($value);
+            }
+            echo $response->body;
+        } catch (\Throwable $th) {
+            $logger->error(
+                '({$th->getMessage()}: {$th->getFile()}, {$th->getLine()}) {$th->getMessage()}'
+            );
+            $logger->error($th->getTraceAsString());
         }
-        echo $response->body;
     }
 
     private static function start_backend(string $command): void {
