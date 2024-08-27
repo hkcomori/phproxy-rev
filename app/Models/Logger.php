@@ -20,7 +20,8 @@ final class Logger {
                 $this->error_enable = true;
                 break;
             default:
-                throw new \UnexpectedValueException('log_level: ' . $log_level);
+                throw new \UnexpectedValueException(
+                    "'{$log_level} is not supported log level'");
         }
     }
 
@@ -51,7 +52,7 @@ final class Logger {
     private function output(string $prefix, string $message): void {
         $resource = fopen($this->uri, 'a');
         if (!is_resource($resource)) {
-            throw new \RuntimeException('Cannot open ' . $this->uri);
+            throw new \RuntimeException("Cannot open '{$this->uri}'");
         }
 
         try {

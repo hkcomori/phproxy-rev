@@ -14,7 +14,8 @@ final class HttpResponse {
         public readonly string $body,
     ) {
         if (($status_code < 100) || (999 < $status_code)) {
-            throw new \UnexpectedValueException("status_code: ".$status_code);
+            throw new \UnexpectedValueException(
+                "'{$status_code}' is out of range for status_code");
 
         }
         $this->header_lines = explode("\r\n", $header);
@@ -35,7 +36,7 @@ final class HttpResponse {
         [$protocol, $status_code, $response_phrase] = explode(" ", $status_line, 3);
 
         if (strpos(strtoupper($protocol), "HTTP/1") !== 0) {
-            throw new \UnexpectedValueException("Protocol: ".$protocol);
+            throw new \UnexpectedValueException("'{$protocol}' is not supported protocol");
         }
 
         return new static(

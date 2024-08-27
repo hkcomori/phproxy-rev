@@ -29,11 +29,11 @@ final class HttpRequest {
             case 'TRACE':
                 break;
             default:
-                throw new \UnexpectedValueException('HttpRequest method: ' . $method);
+                throw new \UnexpectedValueException("'{$method}' is unknown method");
         }
 
         if (strpos($protocol, 'HTTP') !== 0) {
-            throw new \UnexpectedValueException('HttpRequest protocol: ' . $protocol);
+            throw new \UnexpectedValueException("'{$protocol}' is not supported protocol");
         }
     }
 

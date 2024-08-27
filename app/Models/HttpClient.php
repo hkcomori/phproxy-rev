@@ -6,7 +6,10 @@ final class HttpClient {
     /**
      * @param array<int, mixed> $opts   Associative array of Curl options
      */
-    private function __construct(protected array $opts) {
+    private function __construct(
+        protected string $backend_uri,
+        protected array $opts,
+    ) {
     }
 
     /**
@@ -48,7 +51,9 @@ final class HttpClient {
 
             assert($response !== true);
             if ($response === false) {
-                throw new NotConnectableException(curl_error($ch), curl_errno($ch));
+                $message = curl_error($ch) ?: "Cannot connect to '{$this->backend_uri}'";
+                $code = curl_errno($ch);
+                throw new NotConnectableException($message, $code);
             }
         } finally {
             curl_close($ch);
@@ -69,7 +74,8 @@ final class HttpClient {
             while (curl_exec($ch) === false) {
                 sleep(1);
                 if (time() > $time_limit) {
-                    throw new \RuntimeException("Cannot connect backend");
+                    throw new NotConnectableException(
+                        "Cannot connect to '{$this->backend_uri}'");
                 }
             }
         } finally {
@@ -81,19 +87,21 @@ final class HttpClient {
         $opts = [];
         $parsed_url = parse_url($uri);
         if (($parsed_url === false) || (array_key_exists("scheme", $parsed_url) === false)) {
-            throw new \UnexpectedValueException("Invalid URL: " . $uri);
+            throw new \UnexpectedValueException(
+                "URL expected like 'unix:/path/to/backend.sock', but got '{$uri}'");
         }
 
         switch ($parsed_url["scheme"]) {
             case "unix":
                 if (array_key_exists("path", $parsed_url) === false) {
-                    throw new \UnexpectedValueException("Invalid URL: " . $uri);
+                    throw new \UnexpectedValueException("'{$uri}' is invalid backend");
                 }
                 $opts[CURLOPT_UNIX_SOCKET_PATH] = $parsed_url["path"];
                 break;
             default:
-                throw new \UnexpectedValueException("Unsupported scheme: " . $uri);
+                throw new \UnexpectedValueException(
+                    "'{$parsed_url['scheme']}' is not supported scheme");
         }
-        return new static($opts);
+        return new static($uri, $opts);
     }
 }
