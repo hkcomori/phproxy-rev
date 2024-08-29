@@ -26,7 +26,7 @@ final class ReversePHProxy {
                 if (empty($config->backend_cmd)) {
                     throw $th;
                 }
-                static::start_backend($config->backend_cmd);
+                exec($config->backend_cmd);
                 $client->wait_connectable($config->backend_timeout);
                 $response = $client->send($request);
             }
@@ -40,13 +40,6 @@ final class ReversePHProxy {
             echo $response->body;
         } catch (\Throwable $th) {
             $logger->catch($th);
-        }
-    }
-
-    private static function start_backend(string $command): void {
-        $proc = @proc_open($command, [], $pipes);
-        if ($proc === false) {
-            throw new \RuntimeException("Command not found: $command");
         }
     }
 }
