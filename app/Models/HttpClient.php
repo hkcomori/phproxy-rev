@@ -69,6 +69,9 @@ final class HttpClient {
         }
 
         try {
+            foreach ($this->opts as $option => $value) {
+                curl_setopt($ch, $option, $value);
+            }
             curl_setopt($ch, CURLOPT_CONNECT_ONLY, true);
             return (curl_exec($ch) !== false);
         } finally {
