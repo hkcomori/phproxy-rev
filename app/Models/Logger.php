@@ -49,6 +49,12 @@ final class Logger {
         }
     }
 
+    public function catch(\Throwable $th): void {
+        [$summary, $_, $trace] = explode("\n", $th->__toString(), 3);
+        $this->error($summary);
+        $this->debug($trace);
+    }
+
     private function output(string $prefix, string $message): void {
         $resource = fopen($this->uri, 'a');
         if (!is_resource($resource)) {

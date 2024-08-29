@@ -10,7 +10,6 @@ final class ReversePHProxy {
     public static function handle_request(array $env, string $input): void {
         $config = Models\Config::from_env($env);
         $logger = new Models\Logger($config->log_file, $config->log_level);
-        $logger->debug(implode(', ', get_loaded_extensions()));
 
         try {
             $request = Models\HttpRequest::from_cgi(
@@ -40,9 +39,7 @@ final class ReversePHProxy {
             }
             echo $response->body;
         } catch (\Throwable $th) {
-            [$summary, $_, $trace] = explode("\n", $th->__toString(), 3);
-            $logger->error($summary);
-            $logger->debug($trace);
+            $logger->catch($th);
         }
     }
 
