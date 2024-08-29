@@ -62,8 +62,7 @@ final class HttpClient {
         return HttpResponse::from_string($response);
     }
 
-    public function wait_connectable(int $timeout_sec): void {
-        $time_limit = time() + $timeout_sec;
+    public function check_connectable(): bool {
         $ch = curl_init();
         if ($ch === false) {
             throw new \RuntimeException('curl_init failed');
@@ -71,15 +70,21 @@ final class HttpClient {
 
         try {
             curl_setopt($ch, CURLOPT_CONNECT_ONLY, true);
-            while (curl_exec($ch) === false) {
-                sleep(1);
-                if (time() > $time_limit) {
-                    throw new NotConnectableException(
-                        "Cannot connect to '{$this->backend_uri}'");
-                }
-            }
+            return (curl_exec($ch) !== false);
         } finally {
             curl_close($ch);
+        }
+    }
+
+    public function wait_connectable(int $timeout_sec): void {
+        $time_limit = time() + $timeout_sec;
+
+        while (!$this->check_connectable()) {
+            sleep(1);
+            if (time() > $time_limit) {
+                throw new NotConnectableException(
+                    "Cannot connect to '{$this->backend_uri}'");
+            }
         }
     }
 
