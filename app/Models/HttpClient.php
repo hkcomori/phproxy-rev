@@ -7,8 +7,9 @@ final class HttpClient {
      * @param array<int, mixed> $opts   Associative array of Curl options
      */
     private function __construct(
-        protected string $backend_uri,
-        protected array $opts,
+        private string $backend_uri,
+        private Socket $socket,
+        private array $opts,
     ) {
     }
 
@@ -60,25 +61,10 @@ final class HttpClient {
         return HttpResponse::from_string($response);
     }
 
-    public function check_connectable(): bool {
-        $ch = curl_init();
-        if ($ch === false) {
-            throw new \RuntimeException('curl_init failed');
-        }
-
-        try {
-            curl_setopt_array($ch, $this->opts);
-            curl_setopt($ch, CURLOPT_CONNECT_ONLY, true);
-            return (curl_exec($ch) !== false);
-        } finally {
-            curl_close($ch);
-        }
-    }
-
     public function wait_connectable(int $timeout_sec): void {
         $time_limit = time() + $timeout_sec;
 
-        while (!$this->check_connectable()) {
+        while (!$this->socket->is_connectable()) {
             sleep(1);
             if (time() > $time_limit) {
                 throw new NotConnectableException(
@@ -100,12 +86,13 @@ final class HttpClient {
                 if (array_key_exists("path", $parsed_url) === false) {
                     throw new \UnexpectedValueException("'{$uri}' is invalid backend");
                 }
+                $socket = new Socket(AF_UNIX, SOCK_STREAM, SOL_TCP, $parsed_url["path"]);
                 $opts[CURLOPT_UNIX_SOCKET_PATH] = $parsed_url["path"];
                 break;
             default:
                 throw new \UnexpectedValueException(
                     "'{$parsed_url['scheme']}' is not supported scheme");
         }
-        return new static($uri, $opts);
+        return new static($uri, $socket, $opts);
     }
 }
