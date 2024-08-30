@@ -8,7 +8,7 @@ final class HttpClient {
      */
     private function __construct(
         private string $backend_uri,
-        private Socket $socket,
+        private SocketInterface $socket,
         private array $opts,
     ) {
     }
@@ -64,11 +64,11 @@ final class HttpClient {
     public function wait_connectable(int $timeout_sec): void {
         $time_limit = time() + $timeout_sec;
 
-        while (!$this->socket->is_connectable()) {
+        while (!$this->socket->connect()) {
             sleep(1);
             if (time() > $time_limit) {
-                throw new NotConnectableException(
-                    "Cannot connect to '{$this->backend_uri}'");
+                throw new \RuntimeException(
+                    "wait_connectable(): unable to connect '{$this->backend_uri}'");
             }
         }
     }
@@ -86,7 +86,7 @@ final class HttpClient {
                 if (array_key_exists("path", $parsed_url) === false) {
                     throw new \UnexpectedValueException("'{$uri}' is invalid backend");
                 }
-                $socket = new Socket(AF_UNIX, SOCK_STREAM, 0, $parsed_url["path"]);
+                $socket = new UnixDomainSocket($parsed_url["path"]);
                 $opts[CURLOPT_UNIX_SOCKET_PATH] = $parsed_url["path"];
                 break;
             default:
