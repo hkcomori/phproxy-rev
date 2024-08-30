@@ -86,7 +86,7 @@ final class HttpClient {
                 if (array_key_exists("path", $parsed_url) === false) {
                     throw new \UnexpectedValueException("'{$uri}' is invalid backend");
                 }
-                $socket = new Socket(AF_UNIX, SOCK_STREAM, SOL_TCP, $parsed_url["path"]);
+                $socket = new Socket(AF_UNIX, SOCK_STREAM, 0, $parsed_url["path"]);
                 $opts[CURLOPT_UNIX_SOCKET_PATH] = $parsed_url["path"];
                 break;
             default:
