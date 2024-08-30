@@ -23,7 +23,7 @@ class Socket {
     public function is_connectable(): bool {
         $socket = $this->socket_create();
         try {
-            return socket_connect($socket, $this->address, $this->port);
+            return @socket_connect($socket, $this->address, $this->port);
         } finally {
             socket_close($socket);
         }
